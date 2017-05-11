@@ -7,13 +7,12 @@ plugin PkgConfig => 'libxpa';
 
 share {
 
-    plugin Download => (
-        url     => 'https://github.com/ericmandel/xpa/archive/v2.1.18.tar.gz'
-    );
+    plugin Download =>
+      ( url => 'https://github.com/ericmandel/xpa/archive/v2.1.18.tar.gz' );
 
-    plugin Extract           => 'tar.gz';
+    plugin Extract => 'tar.gz';
 
-    patch [ '%{patch} -p1 < %{.install.patch}/v2.1.18.diffs' ];
+    patch ['%{patch} -p1 < %{.install.patch}/v2.1.18.diffs'];
     patch sub {
         my ( $build ) = @_;
 
