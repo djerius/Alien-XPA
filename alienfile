@@ -3,7 +3,7 @@
 use alienfile;
 use Path::Tiny;
 
-plugin PkgConfig => 'libxpa';
+plugin PkgConfig => 'xpa';
 
 share {
 

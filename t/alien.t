@@ -4,20 +4,37 @@ use Test2::Bundle::Extended;
 use Test::Alien;
 
 use Alien::XPA;
-use System::Command;
+
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';
 
 
-run_ok( [ 'xpamb', '--version' ] )->exit_is( 0 )->err_like( qr/2.1.18/ );
+
+my $run = run_ok( [ 'xpaaccess', '--version' ] );
+$run->exit_is( 0 )
+  or bail_out( "can't find xpaaccess. must stop now" );
+my $version = $run->out;
+
+my $xpamb_already_running = run_ok( [ qw[ xpaaccess XPAMB:* ] ])->out eq 'yes';
+
+unless ( $xpamb_already_running ) {
+    exec( 'xpamb' ) if ! fork;
+}
 
 my $xs = do { local $/; <DATA> };
-
 xs_ok $xs, with_subtest {
     my ( $module ) = @_;
-    my $xpamb = System::Command->new( 'xpamb' );
-    ok $module->connected;
+
+    ok $module->connected, "connected to xpamb";
+
+    run_ok( [ 'xpaset', '-p', 'xpamb', '-exit' ] )
+      unless $xpamb_already_running;
+
+    $version = $module->version;
+
+    is( $module->version, $version, "library version same as command line version" );
+
 };
 
 done_testing;
@@ -28,29 +45,40 @@ __DATA__
 #include "perl.h"
 #include "XSUB.h"
 #include <xpa.h>
- 
+
 const char *
-version(const char *class)
+connected(const char *class)
 {
     char *names[1];
     char *messages[1];
 
     int found =
       XPAAccess( NULL,
-                 'XPAMB:*',
+                 "XPAMB:*",
                  NULL,
                  "g",
-                 names,
-                 messages,
+                 &names,
+                 &messages,
                  1 );
 
-    if ( names[1] ) free( names[1] );
-    if ( messages[1] ) free( messages[1] );
+    if ( found && names[0] && strcmp( names[0], "XPAMB:xpamb" ) ) found = 1;
+    else found = 0;
+
+    if ( names[0] ) free( names[0] );
+    if ( messages[0] ) free( messages[0] );
 
     return found;
 }
- 
+
+const char * version( const char* class ) {
+    const char* version = XPA_VERSION;
+    return version;
+}
+
 MODULE = TA_MODULE PACKAGE = TA_MODULE
- 
+
 int connected(class);
+    const char *class;
+
+const char* version(class);
     const char *class;
