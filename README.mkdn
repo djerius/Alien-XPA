@@ -1,12 +1,18 @@
 # NAME
 
-Alien::XPA - a really awesome library
+Alien::XPA - Find or Build libxpa
 
 # VERSION
 
 version 0.01
 
-# SYNOPSIS
+# DESCRIPTION
+
+This distribution installs the XPA library if its not available. It
+provides a uniform interface via [Alien::Base](https://metacpan.org/pod/Alien::Base) to configuration
+information useful to link against it.
+
+For more information, please see [Alien::Build::Manual::AlienUser](https://metacpan.org/pod/Alien::Build::Manual::AlienUser)
 
 # BUGS AND LIMITATIONS
 

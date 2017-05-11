@@ -1,6 +1,6 @@
 package Alien::XPA;
 
-# ABSTRACT: a really awesome library
+# ABSTRACT: Find or Build libxpa
 
 use strict;
 use warnings;
@@ -15,9 +15,11 @@ use base qw( Alien::Base );
 
 __END__
 
+=head1 DESCRIPTION
 
-=head1 SYNOPSIS
+This distribution installs the XPA library if its not available. It
+provides a uniform interface via L<Alien::Base> to configuration
+information useful to link against it.
 
-
-=head1 SEE ALSO
+For more information, please see L<Alien::Build::Manual::AlienUser>
 

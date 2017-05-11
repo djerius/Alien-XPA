@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "a really awesome library",
+  "ABSTRACT" => "Find or Build libxpa",
   "AUTHOR" => "Diab Jerius <djerius\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
