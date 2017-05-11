@@ -16,12 +16,12 @@ share {
         my ( $build ) = @_;
 
         # Makefile.in uses INSTALL_ROOT instead of DESTDIR
-        my $text = path( 'Makefile.in')->slurp;
-        $DB::single=1;
-        $text =~ s/^INSTALL_ROOT\s*=\s*$//m;
-        $text =~ s/INSTALL_ROOT/DESTDIR/g;
-        path( 'Makefile.in')->spew( $text);
-        };
+        path( 'Makefile.in' )->edit_lines(
+            sub {
+                s/^INSTALL_ROOT\s*=\s*$//;
+                s/INSTALL_ROOT/DESTDIR/g;
+            } );
+    };
 
     plugin 'Build::Autoconf' => ();
 };
