@@ -1,0 +1,26 @@
+# NAME
+
+Alien::XPA - a really awesome library
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA](https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA).
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007
