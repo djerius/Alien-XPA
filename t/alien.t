@@ -4,6 +4,7 @@ use Test2::Bundle::Extended;
 use Test::Alien;
 
 use Alien::XPA;
+use Action::Retry 'retry';
 
 
 # this modifies @PATH appropriately
@@ -20,6 +21,17 @@ my $xpamb_already_running = run_ok( [ qw[ xpaaccess XPAMB:* ] ])->out eq 'yes';
 
 unless ( $xpamb_already_running ) {
     exec( 'xpamb' ) if ! fork;
+
+    my $found_it;
+
+    retry {
+        die unless
+          $found_it = qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
+    };
+
+    bail_out( "unable to access launched xpamb" )
+      unless $found_it;;
+
 }
 
 my $xs = do { local $/; <DATA> };
@@ -28,14 +40,16 @@ xs_ok $xs, with_subtest {
 
     ok $module->connected, "connected to xpamb";
 
-    run_ok( [ 'xpaset', '-p', 'xpamb', '-exit' ] )
-      unless $xpamb_already_running;
-
     $version = $module->version;
 
     is( $module->version, $version, "library version same as command line version" );
 
 };
+
+END {
+    system( qw[ xpaset -p xpamb -exit ] )
+      unless $xpamb_already_running;
+}
 
 done_testing;
 

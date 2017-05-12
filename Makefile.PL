@@ -31,9 +31,11 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Action::Retry" => 0,
     "ExtUtils::MakeMaker" => "6.52",
     "File::Spec" => 0,
     "IO::Handle" => 0,
+    "IPC::Cmd" => 0,
     "IPC::Open3" => 0,
     "Test2::Bundle::Extended" => 0,
     "Test::Alien" => 0,
@@ -48,6 +50,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Action::Retry" => 0,
   "Alien::Base" => 0,
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
@@ -55,6 +58,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
   "IO::Handle" => 0,
+  "IPC::Cmd" => 0,
   "IPC::Open3" => 0,
   "Test2::Bundle::Extended" => 0,
   "Test::Alien" => 0,

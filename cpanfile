@@ -11,9 +11,11 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
+  requires "Action::Retry" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
+  requires "IPC::Cmd" => "0";
   requires "IPC::Open3" => "0";
   requires "Test2::Bundle::Extended" => "0";
   requires "Test::Alien" => "0";
