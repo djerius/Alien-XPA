@@ -64,7 +64,6 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::RunExtraTests" => "0";
   requires "Dist::Zilla::Plugin::Test::CPAN::Changes" => "0";
   requires "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" => "0";
-  requires "Dist::Zilla::Plugin::Test::CheckManifest" => "0";
   requires "Dist::Zilla::Plugin::Test::CleanNamespaces" => "0";
   requires "Dist::Zilla::Plugin::Test::Compile" => "0";
   requires "Dist::Zilla::Plugin::Test::Fixme" => "0";
