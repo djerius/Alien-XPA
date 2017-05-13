@@ -19,8 +19,21 @@ my $version = $run->out;
 
 my $xpamb_already_running = run_ok( [ qw[ xpaaccess XPAMB:* ] ])->out eq 'yes';
 
+my $win32_processobj;
 unless ( $xpamb_already_running ) {
-    exec( 'xpamb' ) if ! fork;
+    if ($^O eq 'MSWin32') {
+        require Win32::Process;
+        require File::Which;
+        Win32::Process::Create($win32_processobj,
+            File::Which::which("xpamb"),
+            "xpamb",
+            0,
+            32 + 134217728, #NORMAL_PRIORITY_CLASS + CREATE_NO_WINDOW
+            ".") || die $^E;
+        #$pid = $win32_processobj->GetProcessID();
+    } else {
+         exec( 'xpamb' ) if ! fork;
+    }
 
     my $found_it;
 
@@ -49,6 +62,9 @@ xs_ok $xs, with_subtest {
 END {
     system( qw[ xpaset -p xpamb -exit ] )
       unless $xpamb_already_running;
+    if ($win32_processobj) { #on Windows `xpaset -p xpamb -exit` currently does not work
+      $win32_processobj->Kill(0);
+    }
 }
 
 done_testing;
