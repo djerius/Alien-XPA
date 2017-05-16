@@ -2,6 +2,22 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.02      2017-05-11 17:15:20-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIXES]
+
+   * Win32 specific code to handle test processes
+    (chorny@cpan.org: RT#121653, https://github.com/djerius/Alien-XPA/pull/1)
+
+   * more proper *NIX handling of test processes
+
+   * force -fPIC option in XPA build static library build can be linked
+     into dynamic Perl module
+
+   * increase the timeout for contacting the XPA name server from
+     150ms to 1000ms (Eric Mandel <eric@cfa.harvard.edu> )
+
+
 0.01      2017-05-11 17:15:20-04:00 America/New_York
 
   * Initial release upon an unsuspecting world
