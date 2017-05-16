@@ -1,5 +1,7 @@
+Common subdirectories: xpa-2.1.18.orig/doc and xpa-2.1.18-patched-dont-delete/doc
+diff -u xpa-2.1.18.orig/Makefile.in xpa-2.1.18-patched-dont-delete/Makefile.in
 --- xpa-2.1.18.orig/Makefile.in	2017-05-11 18:04:38.000000000 -0400
-+++ xpa-2.1.18/Makefile.in	2017-05-15 12:02:17.780304000 -0400
++++ xpa-2.1.18-patched-dont-delete/Makefile.in	2017-05-15 12:02:17.780304000 -0400
 @@ -81,7 +81,7 @@
  
  # To change the compiler switches, for example to change from -O
@@ -49,3 +51,68 @@
  		    chmod 755 $$M; \
  		    else true; \
  		fi; \
+Common subdirectories: xpa-2.1.18.orig/man and xpa-2.1.18-patched-dont-delete/man
+Common subdirectories: xpa-2.1.18.orig/notes and xpa-2.1.18-patched-dont-delete/notes
+Common subdirectories: xpa-2.1.18.orig/python and xpa-2.1.18-patched-dont-delete/python
+diff -u xpa-2.1.18.orig/xpa.c xpa-2.1.18-patched-dont-delete/xpa.c
+--- xpa-2.1.18.orig/xpa.c	2017-05-11 18:04:38.000000000 -0400
++++ xpa-2.1.18-patched-dont-delete/xpa.c	2017-05-16 16:03:41.261656000 -0400
+@@ -22,6 +22,8 @@
+ static int ltimeout=XPA_LONG_TIMEOUT; 	/* fillbuf timeout in secs */
+ static int ctimeout=XPA_CONNECT_TIMEOUT;/* local xpans connect */
+ static int verbosity=XPA_VERBOSITY;	/* 0=quiet, 1=normal, 2=full */
++static int nsdelay=XPA_NSDELAY;	/* delay increment waiting for ns to start */
++static int retries=XPA_RETRIES;	/* retries when retrying */
+ static int guseacl=1;		/* 0=don't use acls, 1=enable acls */
+ static int etimestamp=0;	/* 0=don't timestamp errors, 1=do timestamp */
+ static int nsregister=1;	/* 0=don't register with xpans, 1=register */
+@@ -166,7 +168,7 @@
+       xclose(ofd);
+       /* Unix sockets get ECONNREFUSED when the listen queue is full,
+ 	 so we try a few times to give the server a chance to recover */
+-      if( (xerrno == ECONNREFUSED) && (tries < XPA_RETRIES) ){
++      if( (xerrno == ECONNREFUSED) && (tries < retries) ){
+ 	tries++;
+ 	XPASleep(10);
+ 	goto again2;
+@@ -614,7 +616,7 @@
+       xclose(xnsfd);
+       /* Unix sockets get ECONNREFUSED when the listen queue is full,
+ 	 so we try a few times to give the server a chance to recover */
+-      if( (xerrno == ECONNREFUSED) && (tries < XPA_RETRIES) ){
++      if( (xerrno == ECONNREFUSED) && (tries < retries) ){
+ 	tries++;
+ 	XPASleep(10);
+ 	goto again2;
+@@ -691,7 +693,7 @@
+       goto nons;
+ #endif
+     /* enter loop looking to connect */
+-    for(tries=0; tries<XPA_RETRIES; tries++){
++    for(tries=0; tries<retries; tries++){
+       switch(mtype){
+       case XPA_INET:
+ 	/* use $localhost alternately with $host */
+@@ -724,7 +726,7 @@
+ #endif
+       }
+       xclose(xnsfd);
+-      XPASleep(XPA_NSDELAY);
++      XPASleep(nsdelay);
+     }
+     /* if we got here, we did not connect */
+     goto nons;
+@@ -2731,6 +2733,12 @@
+     /* set xpans connect timeout, if necessary */
+     if( (s=(char *)getenv("XPA_CONNECT_TIMEOUT")) != NULL )
+       ctimeout = atoi(s);
++    /* set nsdelay timeout, if necessary */
++    if( (s=(char *)getenv("XPA_NSDELAY")) != NULL )
++      nsdelay = atoi(s);
++    /* set retries, if necessary */
++    if( (s=(char *)getenv("XPA_RETRIES")) != NULL )
++      retries = atoi(s);
+     /* set verbosity level, if necessary */
+     if( (s=(char *)getenv("XPA_VERBOSITY")) != NULL ){
+       if( istrue(s) )
+Only in xpa-2.1.18-patched-dont-delete: xpa.c~
