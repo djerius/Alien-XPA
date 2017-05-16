@@ -5,46 +5,58 @@ use Test::Alien;
 
 use Alien::XPA;
 use Action::Retry 'retry';
+use Child 'child';
+
+# so we can catch segv's
+plan(6);
 
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';
-
-
 
 my $run = run_ok( [ 'xpaaccess', '--version' ] );
 $run->exit_is( 0 )
   or bail_out( "can't find xpaaccess. must stop now" );
 my $version = $run->out;
 
-my $xpamb_already_running = run_ok( [ qw[ xpaaccess XPAMB:* ] ])->out eq 'yes';
+my $xpamb_already_running = run_ok( [qw[ xpaaccess XPAMB:* ]] )->out eq 'yes';
 
-my $win32_processobj;
+our $child;
+our $xpamb_started = 0;
+
 unless ( $xpamb_already_running ) {
-    if ($^O eq 'MSWin32') {
+
+    if ( $^O eq 'MSWin32' ) {
+
         require Win32::Process;
         require File::Which;
-        Win32::Process::Create($win32_processobj,
-            File::Which::which("xpamb"),
+
+        use subs
+          qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
+
+        Win32::Process::Create(
+            $child,
+            File::Which::which( "xpamb" ),
             "xpamb",
             0,
-            32 + 134217728, #NORMAL_PRIORITY_CLASS + CREATE_NO_WINDOW
-            ".") || die $^E;
-        #$pid = $win32_processobj->GetProcessID();
-    } else {
-         exec( 'xpamb' ) if ! fork;
+            Win32::Process::NORMAL_PRIORITY_CLASS
+              + Win32::Process::CREATE_NO_WINDOW,
+            "."
+        ) || die $^E;
+
+    }
+    else {
+
+        $child = child { exec( 'xpamb' ) };
     }
 
-    my $found_it;
-
     retry {
-        die unless
-          $found_it = qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
+        die
+          unless $xpamb_started = qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
     };
 
     bail_out( "unable to access launched xpamb" )
-      unless $found_it;;
-
+      unless $xpamb_started;
 }
 
 my $xs = do { local $/; <DATA> };
@@ -55,19 +67,36 @@ xs_ok $xs, with_subtest {
 
     $version = $module->version;
 
-    is( $module->version, $version, "library version same as command line version" );
-
+    is( $module->version, $version,
+        "library version same as command line version" );
 };
 
 END {
-    system( qw[ xpaset -p xpamb -exit ] )
-      unless $xpamb_already_running;
-    if ($win32_processobj) { #on Windows `xpaset -p xpamb -exit` currently does not work
-      $win32_processobj->Kill(0);
+
+    # try to shut xpamb down nicely
+    if ( $xpamb_started ) {
+
+        system( qw[ xpaset -p xpamb -exit ] );
+
+        retry {
+            die
+              if qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
+        };
+    }
+
+    # be firm if necessary
+    if ( $^O eq 'MSWin32' ) {
+
+        use subs qw( Win32::Process::STILL_ACTIVE );
+
+        $child->GetExitCode( my $exitcode );
+        $child->Kill( 0 ) if $exitcode == Win32::Process::STILL_ACTIVE;
+    }
+
+    else {
+        $child->kill( 9 ) unless $child->is_complete;
     }
 }
-
-done_testing;
 
 __DATA__
 
