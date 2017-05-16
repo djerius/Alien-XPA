@@ -12,16 +12,18 @@ on 'build' => sub {
 
 on 'test' => sub {
   requires "Action::Retry" => "0";
+  requires "Child" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "File::Spec" => "0";
+  requires "File::Which" => "0";
   requires "IO::Handle" => "0";
-  requires "IPC::Cmd" => "0";
   requires "IPC::Open3" => "0";
   requires "Test2::Bundle::Extended" => "0";
   requires "Test::Alien" => "0";
   requires "Test::More" => "0";
   requires "blib" => "1.01";
   requires "perl" => "5.006";
+  requires "subs" => "0";
 };
 
 on 'test' => sub {
@@ -43,6 +45,7 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::CPANFile" => "0";
   requires "Dist::Zilla::Plugin::CheckMetaResources" => "0";
   requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
+  requires "Dist::Zilla::Plugin::DynamicPrereqs" => "0";
   requires "Dist::Zilla::Plugin::EnsureChangesHasContent" => "0";
   requires "Dist::Zilla::Plugin::EnsurePrereqsInstalled" => "0";
   requires "Dist::Zilla::Plugin::GatherDir" => "0";

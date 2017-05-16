@@ -32,17 +32,19 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Action::Retry" => 0,
+    "Child" => 0,
     "ExtUtils::MakeMaker" => "6.52",
     "File::Spec" => 0,
+    "File::Which" => 0,
     "IO::Handle" => 0,
-    "IPC::Cmd" => 0,
     "IPC::Open3" => 0,
     "Test2::Bundle::Extended" => 0,
     "Test::Alien" => 0,
     "Test::More" => 0,
-    "blib" => "1.01"
+    "blib" => "1.01",
+    "subs" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,10 +57,11 @@ my %FallbackPrereqs = (
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
   "Alien::patch" => 0,
+  "Child" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
+  "File::Which" => 0,
   "IO::Handle" => 0,
-  "IPC::Cmd" => 0,
   "IPC::Open3" => 0,
   "Test2::Bundle::Extended" => 0,
   "Test::Alien" => 0,
@@ -66,6 +69,7 @@ my %FallbackPrereqs = (
   "base" => 0,
   "blib" => "1.01",
   "strict" => 0,
+  "subs" => 0,
   "warnings" => 0
 );
 
@@ -75,6 +79,12 @@ use Alien::Build::MM;
 my $abmm = Alien::Build::MM->new;
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 # END code inserted by Dist::Zilla::Plugin::AlienBuild
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
+if ($^O eq 'MSWin32') {
+test_requires( 'Win32::Process' )
+}
+
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -94,4 +104,3 @@ sub MY::postamble {
   $abmm->mm_postamble;
 }
 # END code inserted by Dist::Zilla::Plugin::AlienBuild
-
