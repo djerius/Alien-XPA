@@ -28,4 +28,9 @@ share {
     };
 
     plugin 'Build::Autoconf' => ();
+    build [
+           '%{configure} -disable-shared',
+           '%{make} CFLAGS=-fPIC',
+           '%{make} install',
+    ];
 };
