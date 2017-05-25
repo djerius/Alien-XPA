@@ -40,7 +40,7 @@ unless ( $xpamb_already_running ) {
             "xpamb",
             0,
             Win32::Process::NORMAL_PRIORITY_CLASS
-              + Win32::Process::CREATE_NO_WINDOW,
+              | Win32::Process::CREATE_NO_WINDOW,
             "."
         ) || die $^E;
 
