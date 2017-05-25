@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.04      2017-05-25 14:16:11-04:00 America/New_York (TRIAL RELEASE)
+
+  [TEST FIX]
+
+   * t/alien.t: Win32 process creation flags were incorrectly specified.
+
+
 0.03      2017-05-25 13:09:17-04:00 America/New_York (TRIAL RELEASE)
 
   [BUILD]
