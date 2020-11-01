@@ -5,97 +5,135 @@ use Test::Alien;
 
 use Alien::XPA;
 use Action::Retry 'retry';
+use File::Which qw(which);
 use Child 'child';
 
-# so we can catch segv's
-plan(6);
+sub run { MyRun->new( @_ ) }
 
+# so we can catch segv's
+plan( 7 );
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';
 
+
+diag(  which($_) or bail_out( "can't find $_" ) )
+  for qw( xpaaccess xpamb xpaset );
+
 my $run = run_ok( [ 'xpaaccess', '--version' ] );
 $run->exit_is( 0 )
-  or bail_out( "can't find xpaaccess. must stop now" );
+  or bail_out( "can't run xpaaccess. must stop now" );
 my $version = $run->out;
 
-my $xpamb_already_running = run_ok( [qw[ xpaaccess XPAMB:* ]] )->out eq 'yes';
+# just in case there's one running, remove it.
+remove_xpamb();
 
 our $child;
-our $xpamb_started = 0;
 
-unless ( $xpamb_already_running ) {
-
-    if ( $^O eq 'MSWin32' ) {
-
-        require Win32::Process;
-        require File::Which;
-
-        use subs
-          qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
-
-        Win32::Process::Create(
-            $child,
-            File::Which::which( "xpamb" ),
-            "xpamb",
-            0,
-            Win32::Process::NORMAL_PRIORITY_CLASS
-              | Win32::Process::CREATE_NO_WINDOW,
-            "."
-        ) || die $^E;
-
-    }
-    else {
-
-        $child = child { exec( 'xpamb' ) };
-    }
-
-    retry {
-        die
-          unless $xpamb_started = qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
-    };
-
-    bail_out( "unable to access launched xpamb" )
-      unless $xpamb_started;
+if ( $^O eq 'MSWin32' ) {
+    require Win32::Process;
+    use subs
+      qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
+    Win32::Process::Create(
+        $child,
+        which( 'xpamb' ) or die( "unable to find xpamb" ),
+        "xpamb",
+        0,
+        Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW,
+        "."
+    ) || die $^E;
+}
+else {
+    $child = child { exec { 'xpamb' } 'xpamb' };
 }
 
+my $xpamb_is_running;
+retry {
+    my $run = run_ok( [ 'xpaaccess', 'XPAMB:*' ] );
+    $xpamb_is_running = $run->out =~ qr/yes/;
+    die unless $xpamb_is_running;
+};
+
+bail_out( "unable to access launched xpamb" )
+  unless $xpamb_is_running;
+
 my $xs = do { local $/; <DATA> };
-xs_ok $xs, with_subtest {
+xs_ok { xs => $xs, verbose => 1 }, with_subtest {
     my ( $module ) = @_;
-
     ok $module->connected, "connected to xpamb";
-
     $version = $module->version;
-
     is( $module->version, $version,
         "library version same as command line version" );
 };
 
-END {
+sub remove_xpamb {
 
-    # try to shut xpamb down nicely
-    if ( $xpamb_started ) {
+    my $xpamb_is_running = 1;
+    retry {
+        my $run;
 
-        system( qw[ xpaset -p xpamb -exit ] );
+        $run = run( 'xpaaccess', 'XPAMB:*' );
+        $xpamb_is_running = $run->out =~ 'yes';
 
-        retry {
-            die
-              if qx/xpaaccess 'XPAMB:*'/ =~ 'yes';
-        };
-    }
+        return unless $xpamb_is_running;
+
+        $run = run( 'xpaset', qw [ -p xpamb -exit ] );
+        $xpamb_is_running = $run->err =~ qr[XPA\$ERROR no 'xpaset' access points];
+
+        die if $xpamb_is_running;
+    };
 
     # be firm if necessary
-    if ( $^O eq 'MSWin32' ) {
+    if ( $xpamb_is_running && defined $child ) {
 
-        use subs qw( Win32::Process::STILL_ACTIVE );
+        diag( "force remove our xpamb" );
 
-        $child->GetExitCode( my $exitcode );
-        $child->Kill( 0 ) if $exitcode == Win32::Process::STILL_ACTIVE;
+        retry {
+
+            if ( $^O eq 'MSWin32' ) {
+                use subs qw( Win32::Process::STILL_ACTIVE );
+                $child->GetExitCode( my $exitcode );
+                $child->Kill( 0 ) if $exitcode == Win32::Process::STILL_ACTIVE;
+            }
+
+            else {
+                $child->kill( 9 ) unless $child->is_complete;
+            }
+
+            if ( run( 'xpaaccess', 'XPAMB:*' )->out !~ 'yes' ) {
+                $xpamb_is_running = 0;
+                return;
+            }
+
+            die;
+        }
     }
 
-    else {
-        $child->kill( 9 ) unless $child->is_complete;
+    bail_out( "unable to remove xpamb" )
+      if $xpamb_is_running;
+}
+
+{
+    package MyRun;
+    use Capture::Tiny qw( capture );
+
+    sub new {
+        my ( $class, @args ) = @_;
+        my ( $out, $err, $exit ) = capture { system { $args[0] } @args; $?; };
+        return bless {
+            out  => $out,
+            err  => $err,
+            exit => $exit,
+        }, $class;
     }
+
+    sub out  { $_[0]->{out} }
+    sub err  { $_[0]->{err} }
+    sub exit { $_[0]->{exit} }
+}
+
+END {
+    remove_xpamb();
 }
 
 __DATA__
