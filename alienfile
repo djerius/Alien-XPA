@@ -11,9 +11,10 @@ plugin PkgConfig => 'xpa';
 probe [ 'pkg-config --exists xpa' ];
 
 share {
-    start_url 'https://github.com/ericmandel/xpa/archive/2.1.20.tar.gz';
+    start_url 'https://github.com/ericmandel/xpa/releases/latest';
 
     plugin Download => (
+       filter  => qr/(?:\d+\.\d+\.\d+).tar.gz$/,
        version => qr/(\d+\.\d+\.\d+).tar.gz$/,
     );
 
