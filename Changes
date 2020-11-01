@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.06      2020-11-01 18:52:59-05:00 America/New_York
+
+  [BUILD]
+
+   * distribution fix; no functional changes
+
+
 0.05      2020-11-01 12:13:04-05:00 America/New_York
 
   [ENHANCEMENT]
