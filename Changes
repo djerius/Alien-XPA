@@ -2,6 +2,17 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.05      2020-11-01 12:13:04-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+   *  Use the latest version of the XPA distribution. It rarely changes and is very stable.
+
+  [TEST FIX]
+
+   * be more careful when destroying server
+
+
 0.04      2017-05-25 14:16:11-04:00 America/New_York (TRIAL RELEASE)
 
   [TEST FIX]
