@@ -2,6 +2,12 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.07      2020-11-02 09:14:46-05:00 America/New_York (TRIAL RELEASE)
+
+  [TEST]
+
+   * broke Windows test
+
 0.06      2020-11-01 18:52:59-05:00 America/New_York
 
   [BUILD]
