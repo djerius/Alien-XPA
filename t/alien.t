@@ -36,7 +36,7 @@ if ( $^O eq 'MSWin32' ) {
       qw( Win32::Process::NORMAL_PRIORITY_CLASS Win32::Process::CREATE_NO_WINDOW);
     Win32::Process::Create(
         $child,
-        which( 'xpamb' ) or die( "unable to find xpamb" ),
+        which( 'xpamb' ),
         "xpamb",
         0,
         Win32::Process::NORMAL_PRIORITY_CLASS | Win32::Process::CREATE_NO_WINDOW,
