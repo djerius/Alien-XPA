@@ -11,7 +11,7 @@ use Child 'child';
 sub run { MyRun->new( @_ ) }
 
 # so we can catch segv's
-plan( 7 );
+plan( 5 );
 
 # this modifies @PATH appropriately
 alien_ok 'Alien::XPA';
@@ -49,7 +49,7 @@ else {
 
 my $xpamb_is_running;
 retry {
-    my $run = run_ok( [ 'xpaaccess', 'XPAMB:*' ] );
+    my $run = run( 'xpaaccess', 'XPAMB:*' );
     $xpamb_is_running = $run->out =~ qr/yes/;
     die unless $xpamb_is_running;
 };
