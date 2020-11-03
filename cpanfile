@@ -9,14 +9,14 @@ requires "warnings" => "0";
 on 'build' => sub {
   requires "Alien::Build" => "0.32";
   requires "Alien::Build::MM" => "0.32";
-  requires "ExtUtils::MakeMaker" => "6.52";
+  requires "ExtUtils::MakeMaker" => "7.50";
 };
 
 on 'test' => sub {
   requires "Action::Retry" => "0";
   requires "Capture::Tiny" => "0";
   requires "Child" => "0";
-  requires "ExtUtils::MakeMaker" => "6.52";
+  requires "ExtUtils::MakeMaker" => "7.50";
   requires "File::Spec" => "0";
   requires "File::Which" => "0";
   requires "IO::Handle" => "0";
