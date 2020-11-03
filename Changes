@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.08      2020-11-03 16:35:56-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * attempt to diagnose CPAN Testers build failures:
+     require ExtUtils::MakeMaker 7.50
+
 0.07      2020-11-02 09:14:46-05:00 America/New_York (TRIAL RELEASE)
 
   [TEST]
