@@ -22,7 +22,7 @@ diag(  which($_) or bail_out( "can't find $_" ) )
 
 my $run = run_ok( [ 'xpaaccess', '--version' ] );
 $run->exit_is( 0 )
-  or bail_out( "can't run xpaaccess. must stop now" );
+  or bail_out( "can't run xpaaccess. must stop now:\n" . $run->dump );
 my $version = $run->out;
 
 # just in case there's one running, remove it.
@@ -50,7 +50,11 @@ else {
 my $xpamb_is_running;
 retry {
     my $run = run( 'xpaaccess', 'XPAMB:*' );
-    $xpamb_is_running = $run->out =~ qr/yes/;
+    $xpamb_is_running = $run->exit == 1;
+    if ( $run->exit != 0 && $run->exit != 1 ) {
+        diag $run->dump;
+        bail_out( "error running xpaacces" );
+    }
     die unless $xpamb_is_running;
 };
 
@@ -120,16 +124,37 @@ sub remove_xpamb {
     sub new {
         my ( $class, @args ) = @_;
         my ( $out, $err, $exit ) = capture { system { $args[0] } @args; $?; };
+
+        my $signal = $exit & 127;
+        my $core   = $exit & 128;
+        $exit = $exit >> 8;
+
         return bless {
-            out  => $out,
-            err  => $err,
-            exit => $exit,
+            cmd    => \@args,
+            out    => $out,
+            err    => $err,
+            exit   => $exit,
+            signal => $signal,
+            $core  => $core,
         }, $class;
     }
 
     sub out  { $_[0]->{out} }
     sub err  { $_[0]->{err} }
     sub exit { $_[0]->{exit} }
+    sub core { $_[0]->{core} }
+    sub signal { $_[0]->{signal} }
+    sub cmd { join ' ', @{ $_[0]->{cmd} } }
+
+    sub dump {
+        sprintf "cmd: %s\nexit: %d\ncore; %s\nsignal: %s\nstdout: %s\nstderr: %s\n",
+          $_[0]->cmd,
+          $_[0]->exit,
+          $_[0]->core,
+          $_[0]->signal,
+          $_[0]->out,
+          $_[0]->err
+      }
 }
 
 END {
