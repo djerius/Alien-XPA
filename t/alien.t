@@ -17,6 +17,7 @@ plan( 5 );
 alien_ok 'Alien::XPA';
 
 
+diag "PATH = $ENV{PATH}";
 diag(  which($_) or bail_out( "can't find $_" ) )
   for qw( xpaaccess xpamb xpaset );
 
