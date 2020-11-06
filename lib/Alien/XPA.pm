@@ -5,7 +5,7 @@ package Alien::XPA;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use base qw( Alien::Base );
 
