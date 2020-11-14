@@ -14,10 +14,21 @@ information useful to link against it.
 
 For more information, please see [Alien::Build::Manual::AlienUser](https://metacpan.org/pod/Alien::Build::Manual::AlienUser)
 
-# BUGS AND LIMITATIONS
+# SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at [https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA](https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA).
+## Bugs
+
+Please report any bugs or feature requests to bug-alien-xpa@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-XPA
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/alien-xpa
+
+and may be cloned from
+
+    https://gitlab.com/djerius/alien-xpa.git
 
 # AUTHOR
 
